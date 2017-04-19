@@ -1,45 +1,62 @@
 <?php 
-header("Access-Control-Allow-Origin : *");
+header("Access-Control-Allow-Origin : *"); //les requetes http de type crosssite sont des requetes pour des ressources localisees sur un domaine different de celui a l'origine de la requete 
+
+$retour = array("erreur" => true);
 
 if(isset($_POST["requet"]) && isset($_POST["datab"])){
 	if(!empty($_POST["requet"]) && !empty($_POST["datab"])){
 
 		$bdd = $_POST["datab"];
-		$pdo = new PDO("mysql:host=localhost;dbname=$bdd", "root", "", array(PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING, PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+		$pdo = new PDO("mysql:host=localhost;dbname=$bdd", "root", "");
 
 		$resultat = $pdo -> prepare($_POST["requet"]);
 
-		$resultat -> execute();
+		if($resultat -> execute()){
 
-		$utilisateurs = $resultat -> fetchAll(PDO::FETCH_ASSOC);
-		 
-		$tableau = "<div><div><p>Requet : <span id='requet'></span></p><p>Nombre de lignées : <span id='lignees'>".$resultat->RowCount()."</span></p></div><div><table border='1'><tr>";
+			$utilisateurs = $resultat -> fetchAll(PDO::FETCH_ASSOC);
+			 
+			$tableau = "<div><div><p>Requet : <span id='requet'></span></p><p>Nombre de lignées : <span id='lignees'>".$resultat->RowCount()."</span></p></div><div><table border='1'><tr>";
 
-		foreach ($utilisateurs[0] as $key => $value) {
-			$tableau .= "<th>" . $key ."</th>";
-		}
-
-		$tableau .= "</tr>";
-
-		for ($i=0; $i < count($utilisateurs); $i++) {
-			$tableau .= "<tr>";
-			foreach ($utilisateurs[$i] as $key => $value) {
-				$tableau .= "<td>" . $value . "</td>";
+			foreach ($utilisateurs[0] as $key => $value) {
+				$tableau .= "<th>" . $key ."</th>";
 			}
+
 			$tableau .= "</tr>";
+
+			for ($i=0; $i < count($utilisateurs); $i++) {
+				$tableau .= "<tr>";
+				foreach ($utilisateurs[$i] as $key => $value) {
+					$tableau .= "<td>" . $value . "</td>";
+				}
+				$tableau .= "</tr>";
+			}
+
+			$tableau .= "</table></div></div><br>";
+
+			$retour["erreur"] = false;
+			$retour["message"] = $tableau;
+		}
+		else {
+			$erreur = $resultat -> errorInfo();
+			$retour["message"] = $erreur[2];
 		}
 
-		$tableau .= "</table></div></div><br>";
 
-		echo $tableau;
+	}
 
-	//	echo json_encode($utilisateurs);
+	else {
+		$retour["message"] = "Parametre vide!"; // gestion erreur if emmpty
 	}
 }
 
+else {
+	$retour["message"] = "Parametre manquant"; // gestion erreur if !isset
+}
+
+echo json_encode($retour);
 
 
-/*
+/* ancient
 $pdo = new PDO("mysql:host=localhost", "root", "");
 $databases = $pdo -> query("SHOW DATABASES");
 $databases = $databases -> fetchAll(PDO::FETCH_ASSOC);

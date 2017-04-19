@@ -38,31 +38,44 @@ $dataBase = $databases -> fetchAll(PDO::FETCH_ASSOC);
 	<input type="submit" value="OK">
 	</fieldset>
 </form>
+<div>
+	<p id="message"></p>
+</div>
 <div id="mike"></div>
+
 <script>
 	
-$(function(){
-	$("input").click(function(e){
+$(function(){ //document ready en jquery -> s'execute quand doc est fini
+	$("input").click(function(e){ // le e stock l'évenement
 
-		//Annulation de l'actualiation de la page
-		e.preventDefault();
+		e.preventDefault(); //Annulation de l'actualiation de la page
 
-		// Console prenom Mike
-		console.log("Mike");
+		console.log("Mike"); // Console prenom Mike
 
-		//recuperation valeur textarea
-		var myRequest = $("#sql").val();
+		var myRequest = $("#sql").val(); //recuperation valeur textarea
 		var myDatabase = $("#database").val();
-		// Requete Ajax - envoi des informations du form vers autre page de traitement
-		var request = $.ajax({
+
+		var request = $.ajax({ 	// Requete Ajax - envoi des informations du form vers autre page de traitement, prend du json -> {json}
 		  url: "traitement_ajax.php", // cible page requete
 		  method: "POST", // methode de requete
 		  data : {requet : myRequest, datab : myDatabase} // data envoyé a la page
 		});
 		 
 		request.done(function( msg ) { 
-		  $( "#mike" ).html( msg );
-		  $( "#requet" ).html( myRequest );
+			msg = JSON.parse(msg); // conversion Json en object js
+
+			if(msg.erreur == false) {
+				$( "#mike" ).html( msg.message );
+				$( "#requet" ).html( myRequest );
+				$( "#message" ).text("Voici les résultats de votre requete");
+				$( "#message" ).css({"background-color":"green"});					
+			}
+			else {
+				$( "#message" ).text(msg.message);
+				$( "#message" ).css({"background-color":"red"});
+			}
+
+
 		});
 		 
 		request.fail(function( jqXHR, textStatus ) {
@@ -72,7 +85,6 @@ $(function(){
 });
 
 </script>
-
 
 </body>
 
