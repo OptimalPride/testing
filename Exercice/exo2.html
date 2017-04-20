@@ -1,0 +1,131 @@
+
+<head><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script></head>
+<style>
+
+#info {
+  position: fixed;
+  bottom: 10px;
+  background-color: white;
+}
+#marge {
+	padding-bottom: 40vh;
+}
+</style>
+<script>
+	
+$(function(){ //start document ready en Jquery
+
+		var request = $.ajax({ 	
+		  url: "http://jsonplaceholder.typicode.com/posts", // cible page requete
+		  method: "GET", // methode de requete
+		});
+		 
+		request.done(function( msg ) { 
+
+			var table = "<tr>";
+
+			$.each(msg[0], function(index, value) {
+
+    			table += "<th>";
+    			table += index;
+    			table += "</th>";
+
+			}); 
+
+			table += "</tr>";
+
+			for (var i = 0; i < msg.length; i++) {
+
+			    table += "<tr>";
+
+			    	$.each(msg[i], function(index, value) {
+
+				    	table += "<td><a href='";
+				    	table += msg[i].userId;
+				    	table += "'>";
+						table += value;		    		
+			    		table += "</td>";  
+
+					}); 
+
+			    table += "</tr>";
+
+			}; 
+
+			table += "</tr>";
+
+			$( "#tableau" ).html( table );
+
+			$("a").click(function(e) { // traitement informations individuelle
+
+				e.preventDefault();
+
+				var	y = $(this).attr('href');
+
+				var urlpost = "http://jsonplaceholder.typicode.com/comments?postId=" + y;
+
+				var request2 = $.ajax({ 	
+					url: urlpost, 
+					method: "GET", 
+				});
+
+			request2.done(function( msg2 ) { 
+
+				var info = "";
+
+				info += "<table border='1'>";
+
+				info += "<tr>";
+				
+				$.each(msg2[0], function(index, value) {
+
+	    			info += "<th>";
+	    			info += index;
+	    			info += "</th>";
+
+				});
+
+				info += "</tr>";
+
+				for (var i = 0; i < msg.length; i++) {
+
+				$.each(msg2[i], function(index, value) {
+
+				    if (msg2[i].postId == y) {
+			    		info += "<td>";
+						info += value;	
+						info += "</td>";	    
+
+			    	} 
+				}); 
+
+			    info += "</tr>";
+
+				}
+
+	    		info += "</table>";
+
+				$( "#info" ).html( info ).dialogue();;
+			});
+		});
+		});
+
+		request.fail(function(XPDDR, data){
+			alert("Request fail !")
+		})
+
+
+//testing shit
+var test = "abc def";
+var result = test.split(' ');
+
+}); //fin function()
+</script>
+
+<div id="marge"><table border="1" id="tableau"></div>
+
+</table>
+
+<br><br>
+
+<div id="info"></div>
