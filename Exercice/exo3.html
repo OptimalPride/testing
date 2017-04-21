@@ -1,0 +1,137 @@
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<style>
+@import url('https://fonts.googleapis.com/css?family=Vidaloka');
+
+
+
+* {
+    box-sizing: border-box;
+}
+
+
+
+form {
+    margin: 0 auto;
+    max-width: 600px;
+    font-size: 20px;
+    font-family: 'Vidaloka';
+    margin-top: 60px;
+}
+
+
+
+input {
+    outline: none;
+   display: block;
+   width: 100%;
+   padding: 7px;
+   border: none;
+   border-bottom: 2px solid #FFB900 ;
+   background: transparent;
+   margin-bottom: 10px;
+   font: 16px 'Vidaloka', sans-serif;
+   height: 45px;
+}
+
+
+
+#submit {
+     -moz-transition: all .3s ease-in;
+   -o-transition: all .3s ease-in;
+   -webkit-transition: all .3s ease-in;
+   transition: all .3s ease-in;
+    outline: none;
+   display: block;
+   width: 100%;
+   padding: 7px;
+   border: none;
+   background-color: #eee;
+   margin-bottom: 10px;
+   font: 16px 'Vidaloka', sans-serif;
+   height: 45px;
+}
+
+
+
+#submit:hover {
+
+    background-color: #FFB900 ;
+
+}
+
+
+label {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    font-family: 20px 'Vidaloka', sans-serif;
+}
+	</style>
+</head>
+
+<h1>insertion de voiture dans base de donnee</h1>
+
+<form>
+	<label>marque</label><br>
+	<input type="text" id="marque"><br><br>
+
+	<label>modele</label><br>
+	<input type="text" id="modele"><br><br>
+
+
+	<label>annee</label><br>
+	<input type="number" id="annee"><br><br>
+
+	<label>couleur</label><br>
+	<input type="color" id="couleur"><br><br>
+
+
+	<label>date creation</label><br>
+	<input type="date" id="date_create"><br><br>
+
+	<input type="submit" value="Envoyer" id="submit">
+</form>
+
+<div id="reponse"></div>
+
+<script>
+
+$(function(){
+
+	$("#submit").click(function(e){ //$("input[type=submit]").click(function(e)
+		
+		e.preventDefault();
+
+		var marque = $("#marque").val(); 
+		var modele = $("#modele").val(); 
+		var annee = $("#annee").val(); 
+		var couleur = $("#couleur").val(); 
+		var date_create = $("#date_create").val(); 
+
+		var request = $.ajax({ 	
+		  url: "exo3_traitement.php", 
+		  method: "POST",
+		  data : {marque : marque, modele : modele, annee : annee, couleur : couleur, date_create : date_create} 
+		});
+		 
+		request.done(function( msg ) { 
+			msg = JSON.parse(msg);
+
+			console.log(msg);
+			if(msg.erreur == false) {
+				$( "#reponse" ).html( msg.message );
+			}
+			else{
+				$( "#reponse" ).html( msg.message );
+			}
+		});
+		 
+		request.fail(function( jqXHR, textStatus ) {
+		  alert( "Request failed: " + textStatus );
+		});
+	});
+
+}); //end function
+</script>
